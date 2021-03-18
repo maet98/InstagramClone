@@ -7,7 +7,7 @@ from django.conf import settings
 
 # Routers provide an easy way of automatically determining the URL conf.
 
-router = routers.DefaultRouter()
+router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'posts', PostViewSet)
 router.register(r'profiles', ProfileViewSet)
 router.register(r'comments', CommentViewSet)
@@ -18,6 +18,7 @@ router.register(r'user_posts', UserLikePostViewSet)
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('api/auth/', include('djoser.urls.authtoken')),
     path('admin/', admin.site.urls),
 ]
 
