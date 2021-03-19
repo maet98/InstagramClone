@@ -1,5 +1,4 @@
 from .models import Profile, Post, Comment, user_like_comment, user_like_post
-from django import forms
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
@@ -18,7 +17,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-    comments = CommentSerializer(many=True)
+    comments = CommentSerializer(many=True, read_only=True)
     like = serializers.IntegerField(read_only=True, source='likes.count')
 
     class Meta:
@@ -33,13 +32,6 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ["profile_picture", "bio", "user", "posts"]
-
-    # def create(self, validated_data):
-    #     print(validated_data)
-    #     user_data = validated_data.pop('user')
-    #     user = UserSerializer.create(UserSerializer(), validated_data=user_data)
-    #     profile, created = Profile.objects.update_or_create(user=user, profile_picture=validated_data.pop('profile_picture'), bio=validated_data.pop('bio'))
-    #     return profile
 
 
 
