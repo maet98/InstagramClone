@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:instagramclone/loginPage.dart';
+import 'package:instagramclone/profilePage.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginPage(),
+      home: MyHomePage(),
     );
   }
 }
@@ -85,9 +85,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         fit: BoxFit.fill),
                   ),
                 ),
-                title: Text(
-                  "Miguel",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                title: GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => ProfilePage()));
+                  },
+                  child: Text(
+                    "Miguel",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
                 subtitle: Text("Santiago"),
               ),
