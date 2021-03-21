@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:instagramclone/main.dart';
 
 import './registerPage.dart';
+import 'dataFunctions.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -9,6 +11,9 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+  bool loginTrigger = false;
+  final TextEditingController _username = TextEditingController();
+  final TextEditingController _pass = TextEditingController();
 
   @override
   void initState() {
@@ -37,6 +42,7 @@ class _LoginPageState extends State<LoginPage> {
               width: MediaQuery.of(context).size.width * 0.8,
               padding: EdgeInsets.all(5),
               child: TextFormField(
+                controller: _username,
                 validator: (username) {
                   if (username.isEmpty) {
                     return 'Digite un usuario';
@@ -54,6 +60,7 @@ class _LoginPageState extends State<LoginPage> {
               width: MediaQuery.of(context).size.width * 0.8,
               padding: EdgeInsets.all(5),
               child: TextFormField(
+                controller: _pass,
                 validator: (password) {
                   if (password.isEmpty) {
                     return 'Digite una contraseña';
@@ -81,13 +88,15 @@ class _LoginPageState extends State<LoginPage> {
                   primary: Colors.lightBlue),
               onPressed: () {
                 if (_formKey.currentState.validate()) {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text('Cool')));
+                  setState(() {
+                    loginTrigger = true;
+                  });
                 }
               },
               child: Text('Login',
                   style: TextStyle(color: Colors.white, fontSize: 20)),
-            )
+            ),
+            loginTrigger ? loginProcess() : SizedBox(),
           ],
         )),
       ),
@@ -107,5 +116,17 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
     );
+  }
+
+  FutureBuilder loginProcess() {
+    return FutureBuilder(
+        future: ServiceConsoomer().LoginUser(_username.text, _pass.text),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            MaterialPageRoute(builder: (context) => MyHomePage());
+            return SizedBox();
+          }
+          return CircularProgressIndicator();
+        });
   }
 }
