@@ -26,12 +26,16 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    posts = PostSerializer(many=True)
+    user = UserSerializer()
+    posts = PostSerializer(many=True, read_only=True)
 
     class Meta:
         model = Profile
         fields = ["profile_picture", "bio", "user", "posts"]
+
+    def create(self, validated_data):
+        user = User.objects.create(**validated_data.pop("user"))
+        return Profile.objects.create(user=user, bio=validated_data.pop("bio"), profile_picture=validated_data.pop("profile_picture"))
 
 
 
