@@ -26,7 +26,7 @@ SECRET_KEY = 'ws8f3%)swhd8j9n+w-yl5h-^yp-s3s783#^4$pcxw*yezqmu7w'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["www.miguelestevez.xyz"]
+ALLOWED_HOSTS = ["www.miguelestevez.xyz", "localhost"]
 
 
 # Application definition
