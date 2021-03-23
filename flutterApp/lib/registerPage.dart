@@ -283,7 +283,6 @@ class _RegisterPage extends State<RegisterPage>
         future: ServiceConsoomer().RegisterUser(newUser),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            print("Llegó que es" + snapshot.data.toString());
             return AlertDialog(
               title:
                   Text(snapshot.data ? "Usuario registrado" : "Error de red"),

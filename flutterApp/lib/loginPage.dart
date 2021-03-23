@@ -12,6 +12,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   bool loginTrigger = false;
+  bool badLogin = false;
   final TextEditingController _username = TextEditingController();
   final TextEditingController _pass = TextEditingController();
 
@@ -90,13 +91,36 @@ class _LoginPageState extends State<LoginPage> {
                 if (_formKey.currentState.validate()) {
                   setState(() {
                     loginTrigger = true;
+                    badLogin = false;
+                  });
+                  ServiceConsoomer()
+                      .LoginUser(_username.text, _pass.text)
+                      .then((value) {
+                    if (value) {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MyHomePage()));
+                    } else {
+                      setState(() {
+                        loginTrigger = false;
+                        badLogin = true;
+                      });
+                    }
                   });
                 }
               },
               child: Text('Login',
                   style: TextStyle(color: Colors.white, fontSize: 20)),
             ),
-            loginTrigger ? loginProcess() : SizedBox(),
+            loginTrigger ? CircularProgressIndicator() : SizedBox(),
+            badLogin
+                ? AlertDialog(
+                    title: Text("Error al entrar"),
+                    content:
+                        Text("Revise sus credenciales e intentelo de nuevo"),
+                  )
+                : SizedBox(),
           ],
         )),
       ),
@@ -116,17 +140,5 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
     );
-  }
-
-  FutureBuilder loginProcess() {
-    return FutureBuilder(
-        future: ServiceConsoomer().LoginUser(_username.text, _pass.text),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            MaterialPageRoute(builder: (context) => MyHomePage());
-            return SizedBox();
-          }
-          return CircularProgressIndicator();
-        });
   }
 }
