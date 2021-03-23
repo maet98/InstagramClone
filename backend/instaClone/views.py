@@ -27,20 +27,20 @@ class ProfileViewSet(viewsets.ModelViewSet):
         else:
             return Response("Bad Credentials")
 
-    # def create(self, request, *args, **kwargs):
-    #     post_data = request.data
-    #     print(post_data)
-    #     user = post_data["user"]
-    #     print(user)
-    #     user = json.loads(user)
-    #
-    #     new_user = User.objects.create(first_name=user["first_name"], last_name=user["last_name"], email=user["email"],
-    #                                    password=user["password"], username=user["username"])
-    #     new_user.save()
-    #     new_profile = Profile.objects.create(profile_picture=post_data["profile_picture"], user=new_user, bio=post_data["bio"])
-    #
-    #     serializer = ProfileSerializer(new_profile)
-    #     return Response(serializer.data)
+     def create(self, request, *args, **kwargs):
+         post_data = request.data
+         print(post_data)
+         user = post_data["user"]
+         print(user)
+         user = json.loads(user)
+
+         new_user = User.objects.create(first_name=user["first_name"], last_name=user["last_name"], email=user["email"],
+                                        password=user["password"], username=user["username"])
+         new_user.save()
+         new_profile = Profile.objects.create(profile_picture=post_data["profile_picture"], user=new_user, bio=post_data["bio"])
+
+         serializer = ProfileSerializer(new_profile)
+         return Response(serializer.data)
 
 
 class PostViewSet(viewsets.ModelViewSet):
