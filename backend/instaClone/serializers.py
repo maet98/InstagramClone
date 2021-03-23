@@ -35,8 +35,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User.objects.create(**validated_data.pop("user"))
-        return Profile.objects.create(user=user, bio=validated_data.pop("bio"), profile_picture=validated_data.pop("profile_picture"))
-
+        user.set_password(user.password)
+        user.save()
+        profile = Profile.objects.create(user=user, bio=validated_data.pop("bio"),
+                                      profile_picture=validated_data.pop("profile_picture"))
+        profile.save()
+        return profile
 
 
 class UserLikeCommentSerializer(serializers.ModelSerializer):
