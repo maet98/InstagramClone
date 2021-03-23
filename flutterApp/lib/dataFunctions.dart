@@ -45,6 +45,45 @@ class ServiceConsoomer {
     return res.statusCode >= 200;
   }
 
+  Future<List<Post>> getPosts() async {
+    print("works");
+    List<Post> posts;
+    http.Response getPostsResponse =
+        await client.get(Uri.parse(apiRoute + '/posts'), headers: {
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding': 'gzip, deflate, br',
+    });
+
+    if (getPostsResponse.statusCode != 200) {
+      client.close();
+      return posts;
+    }
+    print("here");
+    print(getPostsResponse.body);
+    posts = List<Post>.from(jsonDecode(getPostsResponse.body)['results']
+        .map((postJson) => Post.fromMap(postJson)));
+    posts.forEach((element) {
+      element.setUser();
+    });
+    client.close();
+    return posts;
+  }
+
+  Future<User> getUser(int id) async {
+    http.Response getUserResponse =
+        await client.get(Uri.parse(apiRoute + '/profile/' + id.toString()));
+
+    if (getUserResponse.statusCode != 200) {
+      client.close();
+      return null;
+    }
+
+    User user = User.fromMap(jsonDecode(getUserResponse.body));
+    client.close();
+    return user;
+  }
+
   Future<bool> LoginUser(String username, String password) async {
     Map credentials = <String, String>{
       'username': username,
