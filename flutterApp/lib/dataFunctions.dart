@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:instagramclone/entities/post.dart';
 import 'package:instagramclone/entities/user.dart';
 
 class ServiceConsoomer {
   static final ServiceConsoomer _consoomer = ServiceConsoomer._internal();
-  static final String apiRoute = 'http://www.miguelestevez.xyz:8000/api';
-  static final String authRoute = 'http://www.miguelestevez.xyz:8000/api-auth';
+  static final String apiRoute = 'http://10.0.0.134:8000/api';
+  static final String authRoute = 'http://10.0.0.134:8000/api-auth';
   static String authToken;
   static User loggedUser;
   final http.Client client = http.Client();
@@ -27,7 +28,11 @@ class ServiceConsoomer {
         filename: user.profile_picture.path.split("/").last));
 
     request.fields['bio'] = user.bio;
-    request.fields['user'] = jsonEncode(user.user.toMap());
+    request.fields['user.username'] = user.user.username;
+    request.fields['user.first_name'] = user.user.first_name;
+    request.fields['user.last_name'] = user.user.last_name;
+    request.fields['user.email'] = user.user.email;
+    request.fields['user.password'] = user.user.password;
 
     request.headers.addAll(<String, String>{
       'Accept': "*/*",
@@ -56,8 +61,8 @@ class ServiceConsoomer {
       return false;
     }
     authToken = jsonDecode(loggedIn.body)['auth_token'];
-    print(authToken);
-
+    client.close();
+    return true;
     //TODO: get user info
   }
 }
