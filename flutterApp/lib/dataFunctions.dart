@@ -84,6 +84,11 @@ class ServiceConsoomer {
 
     print(jsonDecode(getUserResponse.body).toString());
     User user = User.fromMap(jsonDecode(getUserResponse.body));
+    List<Post> posts;
+    posts = (jsonDecode(getUserResponse.body)['posts'] as List)
+        .map((postJson) => Post.fromMap(postJson))
+        .toList();
+    user.posts = posts;
     return user;
   }
 

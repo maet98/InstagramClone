@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:instagramclone/dataFunctions.dart';
 import 'package:instagramclone/loginPage.dart';
-import 'package:instagramclone/newPostPage.dart';
 import 'package:instagramclone/profilePage.dart';
 
 import 'entities/post.dart';
 import 'entities/user.dart';
+import 'newPostPage.dart';
 
 void main() {
   HttpOverrides.global = new MyHttpOverrides();
@@ -47,12 +47,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Future<List<Post>> thePosts;
+
   @override
   void initState() {
     super.initState();
+    setState(() {
+      thePosts = ServiceConsoomer().getPosts();
+    });
   }
 
-  void _onItemTapped(int index) {
+  Future<void> _onItemTapped(int index) async {
     var context = this.context;
     switch (index) {
       case 0:
@@ -63,9 +68,12 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         break;
       case 1:
-        {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => NewPostPage()));
+         {
+          var value = await Navigator.push(
+            context, MaterialPageRoute(builder: (context) => NewPostPage()));
+          setState(() {
+            thePosts = ServiceConsoomer().getPosts();
+          });
         }
         break;
       case 2:
@@ -117,7 +125,6 @@ class _MyHomePageState extends State<MyHomePage> {
         if (snapshot.hasData) {
           if (snapshot.data != null) {
             List<Post> _posts = snapshot.data;
-            print('llego algo');
             return ListView.separated(
               padding: EdgeInsets.all(10),
               separatorBuilder: (context, index) => SizedBox(
@@ -146,7 +153,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ProfilePage()));
+                                builder: (context) => ProfilePage(
+                                    profileId:
+                                        (_posts[index].user as User).id)));
                       },
                       child: Text(
                         (_posts[index].user as User).user.username,

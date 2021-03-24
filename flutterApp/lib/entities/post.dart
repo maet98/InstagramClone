@@ -8,7 +8,7 @@ class Post {
   final String photo;
   final String caption;
   dynamic user;
-  final List<Comment> comments;
+  List<Comment> comments;
   final int like;
 
   Post(this.id, this.photo, this.caption, this.user, this.comments, this.like);

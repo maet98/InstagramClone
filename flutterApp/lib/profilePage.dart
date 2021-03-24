@@ -1,146 +1,138 @@
 import 'package:flutter/material.dart';
 
+import 'dataFunctions.dart';
+import 'entities/user.dart';
+
 class ProfilePage extends StatefulWidget {
+  final int profileId;
+
+  const ProfilePage({Key key, this.profileId}) : super(key: key);
   @override
-  State<StatefulWidget> createState() => _ProfilePage();
+  State<StatefulWidget> createState() => _ProfilePage(profileId);
 }
 
 class _ProfilePage extends State<ProfilePage> {
+  final int profileId;
+
+  _ProfilePage(this.profileId);
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Username",
-          style: TextStyle(color: Colors.black),
-        ),
-      ),
-      body: ListView(
-        children: [
-          Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                        image: NetworkImage(
-                          'https://placeimg.com/40/40/any',
-                        ),
-                        fit: BoxFit.fill),
-                  ),
+    return FutureBuilder<User>(
+        future: ServiceConsoomer().getUser(profileId),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(
+                  snapshot.data.user.username,
+                  style: TextStyle(color: Colors.black),
                 ),
-                Container(
-                    child: Column(
-                  children: [
-                    Text("7",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20)),
-                    Text("posts",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18))
-                  ],
-                )),
-                Container(
-                    child: Column(
-                  children: [
-                    Text("7",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20)),
-                    Text("followers",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18))
-                  ],
-                )),
-                Container(
-                    child: Column(
-                  children: [
-                    Text("7",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20)),
-                    Text("following",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18))
-                  ],
-                ))
-              ],
-            ),
-
-            Padding(
-              padding: EdgeInsets.only(top: 20.0),
-              child: Row(
-                children: [
-                  Column(
-                    children: [
-                      Text(
-                        "Username",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 20.0),
-                        child: Text(
-                          "Bio\n"
-                          "Ecuuuuuuuuuuucha\n"
-                          "mortal\n"
-                          "Humano\n",
-                        ),
-                      )
-                    ],
-                  )
-                ],
               ),
-            ),
-
-            Padding(
-                padding: EdgeInsets.only(top: 20.0),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      minimumSize:
-                          Size(MediaQuery.of(context).size.width * 0.8, 40),
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      primary: Colors.lightBlue),
-                  onPressed: () {},
-                  child: Text('Follow',
-                      style: TextStyle(color: Colors.white, fontSize: 20)),
-                )),
-
-            //TODO: Post Grid
-
-            GridView.builder(
-              itemCount: 20,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    print("Se Envio");
-                  },
-                  child: Container(
-                    width: 300,
-                    height: 300,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: NetworkImage(
-                            'https://placeimg.com/500/500/any',
+              body: ListView(children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                                image: NetworkImage(
+                                  snapshot.data.profile_picture,
+                                ),
+                                fit: BoxFit.fill),
                           ),
-                          fit: BoxFit.fill),
+                        ),
+                        Container(),
+                        Container(),
+                        Container(),
+                        Container(),
+                        Container(),
+                        Container(),
+                        Container(),
+                        Container(),
+                        Container(),
+                        Container(),
+                        Container(
+                            child: Column(
+                          children: [
+                            Text(snapshot.data.posts.length.toString(),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20)),
+                            Text("posts",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18))
+                          ],
+                        )),
+                        Container(),
+                      ],
                     ),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ]
-      ),
-    );
+
+                    Padding(
+                      padding: EdgeInsets.only(top: 20.0),
+                      child: Row(
+                        children: [
+                          Column(
+                            children: [
+                              Text(
+                                snapshot.data.user.username,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 20.0),
+                                child: Text(snapshot.data.bio),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+
+                    //TODO: Post Grid
+
+                    Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: Container(
+                          child: GridView.builder(
+                            shrinkWrap: true,
+                            itemCount: snapshot.data.posts.length,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3),
+                            itemBuilder: (context, index) {
+                              print("enprofile");
+
+                              print(snapshot.data.posts[index]);
+                              return GestureDetector(
+                                onTap: () {
+                                  print("Se Envio");
+                                },
+                                child: Container(
+                                  width: 300,
+                                  height: 300,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: NetworkImage(
+                                          snapshot.data.posts[index].photo,
+                                        ),
+                                        fit: BoxFit.fill),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ))
+                  ],
+                ),
+              ]),
+            );
+          }
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
+        });
   }
 }
