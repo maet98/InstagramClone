@@ -33,7 +33,7 @@ from django.contrib.auth import authenticate, login
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().order_by('-id')
     serializer_class = PostSerializer
 
 
