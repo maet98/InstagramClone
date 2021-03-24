@@ -1,16 +1,13 @@
-import 'package:instagramclone/entities/user.dart';
-
 class Comment {
   final int id;
   final String comment;
-  final User user;
+  dynamic user;
   final int postId;
 
   Comment(this.id, this.comment, this.user, this.postId);
 
   factory Comment.fromMap(Map<String, dynamic> json) {
-    return Comment(json['id'], json['comment'], User.fromMap(json['user']),
-        json['postId']);
+    return Comment(json['id'], json['comment'], json['user'], json['postId']);
   }
 
   Map toMap() {

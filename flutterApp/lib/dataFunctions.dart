@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:instagramclone/entities/post.dart';
@@ -10,7 +11,6 @@ class ServiceConsoomer {
   static final String authRoute = 'http://10.0.0.134:8000/api-auth';
   static String authToken;
   static User loggedUser;
-  final http.Client client = http.Client();
   factory ServiceConsoomer() {
     return _consoomer;
   }
@@ -46,42 +46,85 @@ class ServiceConsoomer {
   }
 
   Future<List<Post>> getPosts() async {
-    print("works");
     List<Post> posts;
     http.Response getPostsResponse =
-        await client.get(Uri.parse(apiRoute + '/posts'), headers: {
+        await http.get(Uri.parse(apiRoute + '/posts'), headers: {
       'Accept': "*/*",
       'connection': 'keep-alive',
       'Accept-Encoding': 'gzip, deflate, br',
     });
 
     if (getPostsResponse.statusCode != 200) {
-      client.close();
       return posts;
     }
-    print("here");
-    print(getPostsResponse.body);
-    posts = List<Post>.from(jsonDecode(getPostsResponse.body)['results']
-        .map((postJson) => Post.fromMap(postJson)));
-    posts.forEach((element) {
-      element.setUser();
+
+    posts = (jsonDecode(getPostsResponse.body)['results'] as List)
+        .map((postJson) => Post.fromMap(postJson))
+        .toList();
+
+    await Future.forEach(posts, (post) async {
+      post.user = await getUser(post.user);
     });
-    client.close();
+
     return posts;
   }
 
   Future<User> getUser(int id) async {
-    http.Response getUserResponse =
-        await client.get(Uri.parse(apiRoute + '/profile/' + id.toString()));
+    http.Response getUserResponse = await http
+        .get(Uri.parse(apiRoute + '/profiles/' + id.toString()), headers: {
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding': 'gzip, deflate, br',
+    });
 
     if (getUserResponse.statusCode != 200) {
-      client.close();
       return null;
     }
+    print("buen req");
 
+    print(jsonDecode(getUserResponse.body).toString());
     User user = User.fromMap(jsonDecode(getUserResponse.body));
-    client.close();
     return user;
+  }
+
+  Future<User> getUserByUsername(String username) async {
+    http.Response getUserResponse = await http
+        .get(Uri.parse(apiRoute + '/profiles?username=' + username), headers: {
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding': 'gzip, deflate, br',
+    });
+
+    if (getUserResponse.statusCode != 200) {
+      return null;
+    }
+    print("buen req");
+
+    print(jsonDecode(getUserResponse.body).toString());
+    User user = User.fromMap(jsonDecode(getUserResponse.body)['results'][0]);
+    return user;
+  }
+
+  Future<bool> PostPicture(File pic, int userId, String caption) async {
+    var request = http.MultipartRequest('POST', Uri.parse(apiRoute + '/posts'));
+
+    request.files.add(http.MultipartFile(
+        'photo', pic.readAsBytes().asStream(), pic.lengthSync(),
+        filename: pic.path.split("/").last));
+
+    request.fields['caption'] = caption;
+    request.fields['user'] = userId.toString();
+
+    request.headers.addAll(<String, String>{
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'Authorization': 'Token ' + authToken
+    });
+
+    var res = await request.send().timeout(Duration(seconds: 5));
+
+    return res.statusCode >= 200;
   }
 
   Future<bool> LoginUser(String username, String password) async {
@@ -89,7 +132,7 @@ class ServiceConsoomer {
       'username': username,
       'password': password
     };
-    http.Response loggedIn = await client.post(
+    http.Response loggedIn = await http.post(
         Uri.parse(apiRoute + '/auth/token/login'),
         headers: {
           'Content-Type': 'application/json',
@@ -100,8 +143,13 @@ class ServiceConsoomer {
       return false;
     }
     authToken = jsonDecode(loggedIn.body)['auth_token'];
-    client.close();
+    loggedUser = await getUserByUsername(username);
     return true;
     //TODO: get user info
+  }
+
+  void LogoutUser() {
+    authToken = null;
+    loggedUser = null;
   }
 }

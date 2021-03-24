@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:instagramclone/dataFunctions.dart';
 import 'package:instagramclone/entities/comment.dart';
-import 'package:instagramclone/entities/user.dart';
 
 class Post {
   final int id;
@@ -19,9 +18,11 @@ class Post {
         json['id'],
         json['photo'],
         json['caption'],
-        User.fromMap(json['user']),
-        List<Comment>.from(
-            jsonDecode(json['comments']).map((com) => Comment.fromMap(com))),
+        json['user'],
+        (json['comments'] as List).map((commentJson) {
+          print(commentJson.toString());
+          Comment.fromMap(commentJson);
+        }).toList(),
         json['like']);
   }
 
@@ -35,7 +36,8 @@ class Post {
     map['photo'] = photo;
     map['caption'] = caption;
     map['user'] = user.toMap();
-    map['comments'] = json.encode(List<dynamic>.from(comments.map((com) => com.toMap())));
+    map['comments'] =
+        json.encode(List<dynamic>.from(comments.map((com) => com.toMap())));
     map['like'] = like;
     return map;
   }

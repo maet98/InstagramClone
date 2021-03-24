@@ -263,7 +263,7 @@ class _RegisterPage extends State<RegisterPage>
                           _email.text,
                           _pass.text);
                       setState(() {
-                        newUser = new User(_bio.text, _profileImage, userInfo);
+                        newUser = new User(null, _bio.text, _profileImage, userInfo);
                         registerTrigger = true;
                       });
                     }
