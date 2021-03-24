@@ -22,7 +22,9 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['photo', 'caption', 'user', 'comments', 'like']
+        fields = '__all__'
+        #fields = ['photo', 'caption', 'user', 'comments', 'like']
+        #extra_kwargs = {'id': {'read_only': True}}
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -31,7 +33,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ["profile_picture", "bio", "user", "posts"]
+        fields = '__all__'
 
     def create(self, validated_data):
         user = User.objects.create(**validated_data.pop("user"))

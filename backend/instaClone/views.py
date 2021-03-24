@@ -11,22 +11,25 @@ from django.contrib.auth import authenticate, login
 
 
 # Create your views here.
-class ProfileViewSet(viewsets.ModelViewSet):
-    permission_classes = (AllowAny,)
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
-
-    @action(detail=True, methods=['post'], url_path="login")
-    def login(self, request, pk=None):
-        print(request.data)
-        user = authenticate(request, username=request.data["username"], password=request.data["password"])
-        if user is not None:
-            log = login(request, user)
-            print(log)
-            return Response("hola")
-        else:
-            return Response("Bad Credentials")
-
+ class ProfileViewSet(viewsets.ModelViewSet):
+     def get_queryset(self):
+         username = self.request.query_params.get('username', None)
+         queryset = Profile.objects.all()
+         if username is not None:
+             queryset = queryset.filter(user__username=username)
+         return queryset
+     permission_classes = (AllowAny,)
+     serializer_class = ProfileSerializer
+     @action(detail=True, methods=['post'], url_path="login")
+     def login(self, request, pk=None):
+         print(request.data)
+         user = authenticate(request, username=request.data["username"], password=request.data["password"])
+         if user is not None:
+             log = login(request, user)
+             print(log)
+             return Response("hola")
+         else:
+             return Response("Bad Credentials")
 
 
 class PostViewSet(viewsets.ModelViewSet):

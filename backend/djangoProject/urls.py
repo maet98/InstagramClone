@@ -9,7 +9,7 @@ from django.conf import settings
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'posts', PostViewSet)
-router.register(r'profiles', ProfileViewSet)
+router.register(r'profiles', ProfileViewSet, basename='profiles')
 router.register(r'comments', CommentViewSet)
 router.register(r'user_comments', UserLikeCommentViewSet)
 router.register(r'user_posts', UserLikePostViewSet)
